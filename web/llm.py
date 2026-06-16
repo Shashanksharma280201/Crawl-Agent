@@ -1,11 +1,12 @@
 """Shared OpenAI helpers: .env loading + client construction.
 
-Used by both the LLM collector-generator (collector_gen.py) and the on-demand
-summary endpoint (app.py). Never hardcodes a key.
+Used by the on-demand summary endpoint in the web app. Never hardcodes a key.
 """
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Repo root (parent of web/) so the default `.env` lookup resolves to the
+# project-root .env, not web/.env.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_dotenv(path=None):
