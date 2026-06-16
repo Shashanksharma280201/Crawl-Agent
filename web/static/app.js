@@ -172,24 +172,30 @@ function renderItems() {
   if (q) list = list.filter((i) => [i.title, i.author, i.group].filter(Boolean).join(" ").toLowerCase().includes(q));
   $("#result-count").textContent = list.length;
   $("#empty").hidden = list.length > 0;
-  $("#items").innerHTML = list.map((it) => `
-    <div class="item">
-      <div class="i-thumb" style="background:${pColor(it.platform)}">
-        <span class="i-thumb-ph">${esc((it.type || "item").charAt(0).toUpperCase() || "•")}</span>
-        ${it.image ? `<img class="i-thumb-img" src="${esc(it.image)}" alt="" loading="lazy" onerror="this.remove()" />` : ""}
-      </div>
-      <div class="i-main">
-        <div class="i-head">
-          <span class="i-pdot" style="background:${pColor(it.platform)}"></span>
-          <span class="i-plat">${esc(pName(it.platform))}</span>
-          <span class="i-type">${esc(it.type || "item")}</span>
-        </div>
-        ${it.url ? `<a class="i-title" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title || "(no title)")}</a>`
-                 : `<span class="i-title">${esc(it.title || "(no title)")}</span>`}
-        <div class="i-sub">${it.group ? `<span class="grp">${esc(it.group)}</span>` : ""}${it.author ? " · " + esc(it.author) : ""}</div>
-        ${it.meta ? `<div class="i-meta">${esc(it.meta)}</div>` : ""}
-      </div>
-    </div>`).join("");
+  $("#items").innerHTML = list.map((it) => {
+    const title = esc(it.title || "(no title)");
+    const sub = [it.author, it.group, it.meta].filter(Boolean).map(esc).join(" · ");
+    const plat = `<span class="card-plat"><span class="cp-dot" style="background:${pColor(it.platform)}"></span>${esc(pName(it.platform))}</span>`;
+    const cls = "card " + (it.image ? "img-card" : "text-card");
+    const open = it.url
+      ? `<a class="${cls}" href="${esc(it.url)}" target="_blank" rel="noopener">`
+      : `<div class="${cls}">`;
+    const close = it.url ? "</a>" : "</div>";
+    if (it.image) {
+      return `${open}
+        ${plat}
+        <img class="card-img" src="${esc(it.image)}" alt="" loading="lazy"
+          onerror="this.closest('.card').classList.add('no-img'); this.remove();" />
+        <div class="card-cap">
+          <div class="card-title">${title}</div>
+          ${sub ? `<div class="card-meta">${sub}</div>` : ""}
+        </div>${close}`;
+    }
+    return `${open}
+      <div class="card-head">${plat}<span class="card-tag">${esc(it.type || "item")}</span></div>
+      <div class="card-title">${title}</div>
+      ${sub ? `<div class="card-meta">${sub}</div>` : ""}${close}`;
+  }).join("");
 }
 
 // ---------- login ----------
