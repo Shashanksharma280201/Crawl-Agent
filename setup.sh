@@ -86,7 +86,7 @@ echo "================================================="
 echo "  Setup complete."
 echo
 echo "  Launch the web app:"
-echo "      python3 app.py        →  open http://localhost:5000"
+echo "      python3 run.py        →  open http://localhost:5050"
 echo
 echo "  Then in the browser: click 'Log in' on a platform card,"
 echo "  sign in once, and hit 'Crawl'. Data is saved to data/<platform>.json"

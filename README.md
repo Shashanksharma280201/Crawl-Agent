@@ -52,9 +52,12 @@ OPENAI_MODEL=gpt-4o
 ## 3. Launch
 
 ```bash
-python3 app.py
+python3 run.py
 ```
-Open **http://localhost:5000**.
+Open **http://localhost:5050**.
+
+> Port **5050** (not 5000): on macOS, the AirPlay Receiver service occupies
+> port 5000 and returns "Access Denied".
 
 ---
 
@@ -90,8 +93,12 @@ The `.json` files are the structured store; the `.md` files are readable lists.
 - `agent-browser` runs **headless Chrome** on a dedicated profile (`.profile/`),
   so your everyday Chrome is never touched and logins persist between runs.
 - `cdp.py` talks to that Chrome (Chrome DevTools Protocol) to scroll + extract.
-- `browser.py` manages the browser (launch, per-platform login detection,
-  crash self-healing). `collect_youtube.py` / `collect.py` do the collection.
+- `collector/browser.py` manages the browser (launch, per-platform login
+  detection, crash self-healing). `collector/engine.py` runs the generic crawl
+  loop; each `collector/platforms/<name>.py` supplies that platform's URLs and
+  extraction JS.
+- Each platform can expose multiple **collections** (e.g. Bookmarks + Likes);
+  tick the Likes box on a platform card to also collect it.
 - Anti-bot: a normal User-Agent + `--disable-blink-features=AutomationControlled`
   so sites (e.g. Reddit) don't block the headless browser.
 - **No MCP, no cloud** — just local programs driving your own browser.
@@ -102,14 +109,10 @@ The `.json` files are the structured store; the `.md` files are readable lists.
 
 | File | Role |
 |---|---|
-| `app.py` | Flask web dashboard |
-| `browser.py` | headless browser + session manager |
-| `platforms.py` | per-platform registry (URLs, auth cookies, extractor) |
-| `collect_youtube.py` | YouTube collector |
-| `collect.py` | Reddit + generic collector (all other platforms) |
-| `cdp.py` | Chrome DevTools client |
-| `llm.py` | OpenAI helper (summary) |
-| `templates/`, `static/` | dashboard UI |
+| `run.py` | entry point (launches the web app) |
+| `web/` | Flask dashboard (`__init__.py`, `templates/`, `static/`, `llm.py`) |
+| `collector/` | engine package: `browser.py`, `cdp.py`, `engine.py`, `storage.py`, `registry.py` |
+| `collector/platforms/` | one module per platform (URLs, auth cookie, collections, extractor JS) |
 | `data/` | collected items (your "database") |
 | `.profile/` | Chrome profile (logins) — large, git-ignored |
 

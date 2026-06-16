@@ -16,7 +16,9 @@ import shutil
 import subprocess
 import time
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Repo root (parent of collector/) so .profile and data/ resolve to the existing
+# project-root dirs — NOT collector/.profile (this module lives in collector/).
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILE = os.path.join(BASE_DIR, ".profile")
 DATA = os.path.join(BASE_DIR, "data")
 SESSION_FILE = os.path.join(DATA, "session.json")
@@ -157,7 +159,7 @@ def _all_cookies():
     if not host:
         return []
     try:
-        import cdp
+        from collector import cdp
         c, _ = cdp.connect(host, url_substr="")
         cookies = c.send("Network.getAllCookies", timeout=15).get("cookies", [])
         c.close()
@@ -173,11 +175,11 @@ def logged_in(cookie="LOGIN_INFO", domain="youtube.com"):
 
 def platform_login_status():
     """{platform_key: bool} for ALL platforms, from a single cookie read."""
-    from platforms import PLATFORMS
+    from collector.registry import PLATFORMS
     cookies = _all_cookies()
     out = {}
     for p in PLATFORMS:
-        out[p["key"]] = any(n == p["auth_cookie"] and p["domain"] in d for n, d in cookies)
+        out[p.key] = any(n == p.auth_cookie and p.domain in d for n, d in cookies)
     return out
 
 
