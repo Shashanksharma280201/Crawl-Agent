@@ -4,8 +4,8 @@ import importlib
 
 from collector.platforms.base import validate_platform
 
-# Plan B appends: twitter, pinterest, linkedin, instagram, tiktok, facebook
-_MODULE_NAMES = ["youtube", "reddit"]
+_MODULE_NAMES = ["youtube", "reddit", "twitter", "pinterest", "linkedin",
+                 "instagram", "tiktok", "facebook"]
 
 
 def load_platforms():
