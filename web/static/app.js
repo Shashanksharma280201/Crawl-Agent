@@ -89,7 +89,7 @@ function renderCrawlCards() {
     const needLogin = !p.logged_in;
     const tag = p.status === "solid"
       ? '<span class="tag ready">ready</span>'
-      : '<span class="tag" style="color:var(--accent);background:#FEF3C7">experimental</span>';
+      : '<span class="tag experimental">experimental</span>';
     let label, action, disabled = false, bg = p.color;
     if (running) { label = '<span class="mini-spin"></span> Working…'; action = "none"; disabled = true; }
     else if (needLogin) { label = "Log in"; action = "login"; }
