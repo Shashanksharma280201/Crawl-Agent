@@ -4,3 +4,4 @@ data/*.json
 data/*.md
 __pycache__/
 *.pyc
+docs/*
