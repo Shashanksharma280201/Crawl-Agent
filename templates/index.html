@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saved Content Collector — Headless</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </span>
+      <div><strong>Saved Collector</strong><span>headless · file-based</span></div>
+    </div>
+    <nav class="side-nav">
+      <p class="nav-title">Platforms</p>
+      <div id="side-platforms"></div>
+    </nav>
+    <div class="side-foot">
+      <div class="health" id="browser-health"><span class="dot"></span><span id="browser-text">checking…</span></div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="page-head">
+      <div>
+        <h1>Your saved content</h1>
+        <p class="muted">Headless collection from a logged-in browser — no window after login.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn primary" id="summarize">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21 8 14 2 9.4h7.6z"/></svg>
+          Summarize with AI
+        </button>
+      </div>
+    </header>
+
+    <!-- Session / login state -->
+    <section class="session-banner" id="session-banner">
+      <span class="s-dot"></span>
+      <div>
+        <div class="s-text" id="session-text">Checking session…</div>
+        <div class="s-sub" id="session-sub"></div>
+      </div>
+      <div class="s-actions">
+        <button class="btn primary" id="login-btn" hidden>Log in</button>
+      </div>
+    </section>
+
+    <section class="kpis" id="kpis"></section>
+
+    <section class="block">
+      <div class="block-head"><h2>Collectors</h2></div>
+      <div class="crawl-grid" id="crawl-grid"></div>
+    </section>
+
+    <section class="block">
+      <div class="block-head results-head">
+        <h2>Results <span class="badge" id="result-count">0</span></h2>
+        <div class="result-controls">
+          <div class="search">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="search" id="search" placeholder="Search title, channel…" />
+          </div>
+        </div>
+      </div>
+      <div class="filterbar" id="filterbar">
+        <span class="filter-label">Filter by platform</span>
+        <div class="filter-chips" id="filter-chips"></div>
+        <button class="link-btn" id="clear-filters" hidden>Clear</button>
+      </div>
+      <div class="items" id="items"></div>
+      <div class="empty" id="empty" hidden><p id="empty-text">No items yet — log in, then run a collector.</p></div>
+    </section>
+  </main>
+
+  <div class="overlay" id="summary-overlay" hidden></div>
+  <aside class="summary-panel" id="summary-panel" hidden>
+    <div class="sp-head">
+      <div class="sp-title"><strong>AI Summary</strong></div>
+      <button class="icon-btn" id="sp-close">✕</button>
+    </div>
+    <p class="sp-scope" id="sp-scope"></p>
+    <div class="sp-body" id="sp-body"></div>
+  </aside>
+
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer-head">
+      <span class="spinner" id="drawer-spinner"></span>
+      <strong id="drawer-title">Crawling…</strong>
+      <span class="drawer-status" id="drawer-status"></span>
+      <button class="icon-btn" id="drawer-close">✕</button>
+    </div>
+    <pre class="log" id="drawer-log"></pre>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

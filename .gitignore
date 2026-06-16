@@ -1,0 +1,6 @@
+.env
+.profile/
+data/*.json
+data/*.md
+__pycache__/
+*.pyc
