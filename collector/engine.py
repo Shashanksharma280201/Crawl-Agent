@@ -107,7 +107,11 @@ def run(platform_key, requested_keys=None, log=print, data_dir=DATA):
         log(f"[FAIL] not logged in to {p.name}. Click 'Log in' on its card.")
         return 3
 
-    client, _ = cdp.connect(browser.cdp_host(), url_substr="")
+    host = browser.cdp_host()
+    if not host:
+        log(f"[FAIL] {p.name}: headless browser didn't come up (no CDP port).")
+        return 4
+    client, _ = cdp.connect(host, url_substr="")
     try:
         client.send("Network.setUserAgentOverride", {"userAgent": browser.NORMAL_UA})
     except Exception:

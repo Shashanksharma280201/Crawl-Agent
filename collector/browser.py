@@ -16,7 +16,9 @@ import shutil
 import subprocess
 import time
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Repo root (parent of collector/) so .profile and data/ resolve to the existing
+# project-root dirs — NOT collector/.profile (this module lives in collector/).
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILE = os.path.join(BASE_DIR, ".profile")
 DATA = os.path.join(BASE_DIR, "data")
 SESSION_FILE = os.path.join(DATA, "session.json")
