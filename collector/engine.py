@@ -23,21 +23,8 @@ def _on_login(client):
         return False
 
 
-def scroll_until_stall(client, probe_js, log, sleep=time.sleep,
-                       max_rounds=80, stable_target=3):
-    last, stable, rnd = object(), 0, 0
-    while rnd < max_rounds and stable < stable_target:
-        client.evaluate(_SCROLL_JS)
-        sleep(random.uniform(2.0, 4.0))
-        cur = client.evaluate(probe_js)
-        stable = stable + 1 if cur == last else 0
-        last = cur
-        rnd += 1
-        if rnd % 3 == 0:
-            log(f"    scroll {rnd}: {cur} (stable {stable}/{stable_target})")
-
-
-def crawl_collection(client, collection, url, log, sleep=time.sleep):
+def crawl_collection(client, collection, url, log, sleep=time.sleep,
+                     max_rounds=80, stable_target=3):
     """Navigate to `url`, run the nav strategy, return raw extracted items."""
     if collection.nav == "paginate":
         items, cur = [], url
@@ -57,15 +44,33 @@ def crawl_collection(client, collection, url, log, sleep=time.sleep):
             sleep(random.uniform(2.0, 4.0))
         return items
 
-    # scroll
+    # scroll: extract EVERY round and accumulate (dedup), because many feeds
+    # (Twitter/Instagram/TikTok/Pinterest/LinkedIn/Facebook) virtualize the DOM
+    # and discard off-screen items as you scroll — a single final extract would
+    # capture only the last screenful.
     client.send("Page.navigate", {"url": url})
     sleep(6)
     if _on_login(client):
         log(f"[skip] {collection.key}: redirected to login.")
         return []
     probe = collection.count_js or _SCROLL_JS
-    scroll_until_stall(client, probe, log, sleep=sleep)
-    return client.evaluate(collection.extract_js) or []
+    acc, seen = [], set()
+    last, stable, rnd = object(), 0, 0
+    while rnd < max_rounds and stable < stable_target:
+        client.evaluate(_SCROLL_JS)
+        sleep(random.uniform(2.0, 4.0))
+        for it in (client.evaluate(collection.extract_js) or []):
+            k = it.get("url") or it.get("title")
+            if k and k not in seen:
+                seen.add(k)
+                acc.append(it)
+        cur = client.evaluate(probe)
+        stable = stable + 1 if cur == last else 0
+        last = cur
+        rnd += 1
+        if rnd % 3 == 0:
+            log(f"    scroll {rnd}: {len(acc)} items (stable {stable}/{stable_target})")
+    return acc
 
 
 def select_collections(platform, requested_keys):

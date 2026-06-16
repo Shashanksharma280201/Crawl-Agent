@@ -42,6 +42,38 @@ def test_scroll_stops_when_probe_stabilizes():
     assert raw == [{"url": "u1", "title": "t"}]
 
 
+def test_scroll_accumulates_virtualized_items():
+    # Simulates a virtualized feed: each extract returns a different window of
+    # items; the engine must accumulate (dedup) ALL of them, not just the last.
+    class VFake:
+        def __init__(self):
+            self.windows = [
+                [{"url": "u1", "title": "1"}, {"url": "u2", "title": "2"}],
+                [{"url": "u2", "title": "2"}, {"url": "u3", "title": "3"}],
+                [{"url": "u3", "title": "3"}, {"url": "u4", "title": "4"}],
+            ]
+            self.heights = [10, 20, 30, 30, 30]
+            self.i = 0
+
+        def send(self, *a, **k):
+            return {}
+
+        def evaluate(self, expr, **k):
+            if "location.href" in expr:
+                return "https://e.com/s"
+            if expr == "EXTRACT":
+                w = self.windows[min(self.i, len(self.windows) - 1)]
+                self.i += 1
+                return list(w)
+            if expr == "PROBE":
+                return self.heights.pop(0) if self.heights else 30
+            return None
+
+    raw = engine.crawl_collection(VFake(), _scroll_collection(), "https://e.com/s",
+                                  log=lambda m: None, sleep=lambda s: None)
+    assert sorted(it["url"] for it in raw) == ["u1", "u2", "u3", "u4"]
+
+
 def test_scroll_skips_when_on_login_page():
     client = FakeClient(heights=[10], extract=[{"url": "u1", "title": "t"}],
                         location="https://e.com/login")
