@@ -96,6 +96,15 @@ function renderCrawlCards() {
     else if (HEALTH.busy) { label = "Queue busy"; action = "none"; disabled = true; bg = "var(--muted-2)"; }
     else { label = "Crawl"; action = "crawl"; }
 
+    const cols = (p.collections || []);
+    const collBoxes = cols.map((c) => {
+      const isLikes = c.kind === "likes";
+      return `<label class="coll-opt">
+        <input type="checkbox" class="coll-cb" data-key="${p.key}" value="${c.key}"
+          ${isLikes ? "" : "checked disabled"} />
+        <span>${esc(c.name)}</span></label>`;
+    }).join("");
+
     const card = document.createElement("div");
     card.className = "ccard";
     card.innerHTML = `
@@ -109,6 +118,7 @@ function renderCrawlCards() {
             style="width:8px;height:8px;border-radius:50%;background:${p.logged_in ? 'var(--success)' : 'var(--muted-2)'}"></span>
           ${tag}
         </div></div>
+      <div class="c-colls">${collBoxes}</div>
       <button class="btn primary pbtn" data-key="${p.key}" data-action="${action}" ${disabled ? "disabled" : ""}
         style="background:${needLogin ? 'var(--accent)' : bg}">${label}</button>
       <div class="c-status" id="cstatus-${p.key}"></div>`;
@@ -195,7 +205,12 @@ async function doLogin() {
 // ---------- crawl ----------
 async function startCrawl(key) {
   const statusEl = $(`#cstatus-${key}`);
-  const r = await fetch(`/api/crawl/${key}`, { method: "POST" });
+  const collections = $$(`.coll-cb[data-key="${key}"]`)
+    .filter((cb) => cb.checked).map((cb) => cb.value);
+  const r = await fetch(`/api/crawl/${key}`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ collections }),
+  });
   const j = await r.json();
   if (!r.ok) { statusEl.className = "c-status err"; statusEl.textContent = j.message || j.error; return; }
   statusEl.className = "c-status run"; statusEl.textContent = "Started…";
