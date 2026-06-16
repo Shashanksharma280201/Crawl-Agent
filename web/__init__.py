@@ -5,6 +5,7 @@ serial crawl queue, file-based storage.
 """
 import json
 import os
+import re
 import threading
 
 from flask import Flask, jsonify, render_template, request
@@ -27,6 +28,19 @@ def load_items(key):
     return storage.load_items(os.path.join(DATA, f"{key}.json"))
 
 
+def item_image(key, it):
+    """Preview thumbnail URL for an item, or None.
+
+    YouTube: derived from the video id in the watch URL (no stored field needed).
+    Others: a real http(s) `thumbnail` captured by the extractor, else None.
+    """
+    if key == "youtube":
+        m = re.search(r"[?&]v=([\w-]+)", it.get("url") or "")
+        return f"https://i.ytimg.com/vi/{m.group(1)}/mqdefault.jpg" if m else None
+    thumb = it.get("thumbnail")
+    return thumb if (thumb and thumb.startswith("http")) else None
+
+
 def normalize(key, items):
     p = BY_KEY.get(key)
     labels = label_map(p) if p else {}
@@ -39,6 +53,7 @@ def normalize(key, items):
             "title": it.get("title"), "author": it.get("author"),
             "url": it.get("url"), "meta": it.get("meta") or it.get("duration") or "",
             "group": group, "collection": coll,
+            "image": item_image(key, it),
         })
     return out
 

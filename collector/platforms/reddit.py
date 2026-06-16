@@ -11,6 +11,12 @@ _EXTRACT_JS = r"""
     const isC = fn.startsWith('t1_');
     const titleEl = t.querySelector('a.title');
     const body = t.querySelector('div.md');
+    // Real post thumbnail only: old.reddit uses placeholder <img>-less anchors
+    // (class "self"/"default"/"nsfw") for text posts — those have no usable src.
+    const img = t.querySelector('a.thumbnail img');
+    let thumb = img ? (img.getAttribute('src') || '') : '';
+    if (thumb.startsWith('//')) thumb = 'https:' + thumb;
+    if (!/^https?:/.test(thumb)) thumb = null;
     out.push({
       type: isC ? 'comment' : 'post',
       title: titleEl ? titleEl.textContent.trim()
@@ -21,6 +27,7 @@ _EXTRACT_JS = r"""
            ? 'https://www.reddit.com' + t.getAttribute('data-permalink')
            : (t.getAttribute('data-url') || null),
       meta: t.getAttribute('data-score') ? '⬆ ' + t.getAttribute('data-score') : '',
+      thumbnail: thumb,
       body: (isC && body) ? body.textContent.trim() : null,
     });
   }
