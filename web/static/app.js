@@ -43,7 +43,7 @@ function renderSidebar() {
     return `
     <div class="sb-row ${selected.has(p.key) ? "active" : ""}" data-key="${p.key}">
       <button class="sb-main" data-key="${p.key}" title="${esc(p.name)}">
-        <span class="sb-ico" style="background:${p.color}"><i class="sb-login-dot ${p.logged_in ? "on" : ""}"></i></span>
+        <span class="sb-ico" style="background:${p.color}1A;color:${p.color}">${(p.name.match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()}<i class="sb-login-dot ${p.logged_in ? "on" : ""}"></i></span>
         <span class="a-label sb-name">${esc(p.name)}</span>
         <span class="a-label sb-count">${p.count || ""}</span>
       </button>
