@@ -14,11 +14,15 @@ _EXTRACT_JS = r"""
     if (!m || seen.has(m[1])) continue;
     seen.add(m[1]);
     const img = a.querySelector('img');
-    const alt = img ? (img.getAttribute('alt') || '').trim() : '';
+    let alt = img ? (img.getAttribute('alt') || '').trim() : '';
+    // Pinterest auto-prefixes image alt text ("This contains an image of: …",
+    // "This may contain: …"). Strip the boilerplate to recover the real caption.
+    alt = alt.replace(/^(this contains an image of:|this may contain:)\s*/i, '').trim();
     const src = img ? (img.getAttribute('src') || '') : '';
+    const label = (a.getAttribute('aria-label') || '').trim();
     out.push({
       type: 'pin',
-      title: alt || a.textContent.trim().slice(0, 120) || 'Pin',
+      title: alt || label || a.textContent.trim().slice(0, 120) || 'Pin',
       author: null,
       url: 'https://www.pinterest.com/pin/' + m[1] + '/',
       meta: '',
