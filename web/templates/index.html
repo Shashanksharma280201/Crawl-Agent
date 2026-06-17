@@ -10,19 +10,38 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="logo">
+  <!-- Mobile top bar -->
+  <header class="topbar">
+    <button class="topbar-burger" id="nav-toggle" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <span class="topbar-title">Saved Collector</span>
+  </header>
+  <div class="scrim" id="nav-scrim" hidden></div>
+
+  <!-- Collapsible sidebar: platforms + crawl controls -->
+  <aside class="a-sidebar" id="sidebar" aria-label="Platforms">
+    <div class="a-brand">
       <span class="logo-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
       </span>
-      <div><strong>Saved Collector</strong><span>headless · file-based</span></div>
+      <span class="a-label brand-name">Saved Collector</span>
     </div>
-    <nav class="side-nav">
-      <p class="nav-title">Platforms</p>
+
+    <nav class="a-nav">
+      <button class="a-link active" id="nav-all">
+        <span class="a-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </span>
+        <span class="a-label sb-name">All content</span>
+        <span class="a-label sb-count" id="all-count"></span>
+      </button>
       <div id="side-platforms"></div>
     </nav>
-    <div class="side-foot">
-      <div class="health" id="browser-health"><span class="dot"></span><span id="browser-text">checking…</span></div>
+
+    <div class="a-foot">
+      <div class="health" id="browser-health"><span class="dot"></span><span class="a-label" id="browser-text">checking…</span></div>
+      <div class="a-label a-account" id="account-line"></div>
     </div>
   </aside>
 
@@ -30,7 +49,7 @@
     <header class="page-head">
       <div>
         <h1>Your saved content</h1>
-        <p class="muted">Headless collection from a logged-in browser — no window after login.</p>
+        <p class="muted">Headless collection from a logged-in browser — pick a platform in the sidebar to crawl.</p>
       </div>
       <div class="head-actions">
         <button class="btn primary" id="summarize">
@@ -40,42 +59,18 @@
       </div>
     </header>
 
-    <!-- Session / login state -->
-    <section class="session-banner" id="session-banner">
-      <span class="s-dot"></span>
-      <div>
-        <div class="s-text" id="session-text">Checking session…</div>
-        <div class="s-sub" id="session-sub"></div>
-      </div>
-      <div class="s-actions">
-        <button class="btn primary" id="login-btn" hidden>Log in</button>
-      </div>
-    </section>
-
-    <section class="kpis" id="kpis"></section>
-
-    <section class="block">
-      <div class="block-head"><h2>Collectors</h2></div>
-      <div class="crawl-grid" id="crawl-grid"></div>
-    </section>
-
     <section class="block">
       <div class="block-head results-head">
         <h2>Results <span class="badge" id="result-count">0</span></h2>
         <div class="result-controls">
           <div class="search">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="search" id="search" placeholder="Search title, channel…" />
+            <input type="search" id="search" placeholder="Search title, author…" />
           </div>
         </div>
       </div>
-      <div class="filterbar" id="filterbar">
-        <span class="filter-label">Filter by platform</span>
-        <div class="filter-chips" id="filter-chips"></div>
-        <button class="link-btn" id="clear-filters" hidden>Clear</button>
-      </div>
       <div class="items" id="items"></div>
-      <div class="empty" id="empty" hidden><p id="empty-text">No items yet — log in, then run a collector.</p></div>
+      <div class="empty" id="empty" hidden><p id="empty-text">No items yet — log in to a platform in the sidebar, then Crawl.</p></div>
     </section>
   </main>
 
